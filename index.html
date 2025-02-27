@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat en ligne</title>
+    <title>Chat et Envoi IP</title>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
     <style>
@@ -17,12 +17,13 @@
             align-items: center;
             height: 100vh;
         }
-        .chat-container {
+        .container {
             width: 400px;
             background: #fff;
             padding: 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
+            text-align: center;
         }
         .chat-box {
             height: 300px;
@@ -49,64 +50,48 @@
             border-radius: 5px;
             cursor: pointer;
         }
-        .user-list {
+        .disclaimer {
+            font-size: 12px;
+            color: red;
             margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <h2>Choisissez un pseudo</h2>
-        <input type="text" id="username" placeholder="Entrez un pseudo">
-        <button onclick="setUsername()">Valider</button>
-        <div id="chat-section" style="display: none;">
-            <h3>Chat général</h3>
-            <div class="chat-box" id="chat-box"></div>
-            <div class="input-box">
-                <input type="text" id="message" placeholder="Écrivez un message">
-                <button onclick="sendMessage()">Envoyer</button>
-            </div>
-            <h3>Utilisateurs en ligne</h3>
-            <div class="user-list" id="user-list"></div>
+    <div class="container">
+        <h2>Votre adresse IP</h2>
+        <p id="ip-address">Chargement...</p>
+        <button onclick="sendIP()">Envoyer mon IP</button>
+        <button onclick="useSecurityCode()">Utiliser un code d'aide</button>
+        <p class="disclaimer">En cliquant sur "Envoyer mon IP", votre adresse IP sera transmise par email pour faciliter l'assistance. Vous pouvez refuser et entrer un code d'aide à la place.</p>
+        <div id="security-code-section" style="display: none;">
+            <input type="text" id="security-code" placeholder="Entrez votre code d'aide">
+            <button onclick="submitSecurityCode()">Valider</button>
         </div>
     </div>
 
     <script>
-        let username = "";
-        let users = [];
-        let messages = [];
-
-        function setUsername() {
-            const input = document.getElementById("username");
-            if (input.value.trim() === "" || users.includes(input.value)) {
-                alert("Pseudo déjà utilisé ou invalide");
-                return;
-            }
-            username = input.value;
-            users.push(username);
-            document.getElementById("chat-section").style.display = "block";
-            input.style.display = "none";
-            document.querySelector("button").style.display = "none";
-            updateUsers();
+        async function fetchIP() {
+            const response = await fetch('https://api64.ipify.org?format=json');
+            const data = await response.json();
+            document.getElementById("ip-address").innerText = data.ip;
         }
-
-        function sendMessage() {
-            const input = document.getElementById("message");
-            if (input.value.trim() === "") return;
-            messages.push(`${username}: ${input.value}`);
-            input.value = "";
-            updateChat();
+        
+        function sendIP() {
+            const ip = document.getElementById("ip-address").innerText;
+            window.location.href = `mailto:tylianmioque83@gmail.com?subject=Aide avec IP&body=Mon IP: ${ip}`;
         }
-
-        function updateChat() {
-            const chatBox = document.getElementById("chat-box");
-            chatBox.innerHTML = messages.map(msg => `<p>${msg}</p>`).join("");
-            chatBox.scrollTop = chatBox.scrollHeight;
+        
+        function useSecurityCode() {
+            document.getElementById("security-code-section").style.display = "block";
         }
-
-        function updateUsers() {
-            document.getElementById("user-list").innerHTML = users.map(user => `<p>${user}</p>`).join("");
+        
+        function submitSecurityCode() {
+            const code = document.getElementById("security-code").value;
+            alert("Code soumis: " + code);
         }
+        
+        fetchIP();
     </script>
 </body>
 </html>
