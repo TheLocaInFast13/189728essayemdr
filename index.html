@@ -55,6 +55,11 @@
             color: red;
             margin-top: 10px;
         }
+        .loading {
+            display: none;
+            margin-top: 10px;
+            color: green;
+        }
     </style>
 </head>
 <body>
@@ -63,11 +68,12 @@
         <p id="ip-address">Chargement...</p>
         <button onclick="sendIP()">Envoyer mon IP</button>
         <button onclick="useSecurityCode()">Utiliser un code d'aide</button>
-        <p class="disclaimer">En cliquant sur "Envoyer mon IP", votre adresse IP sera transmise par email pour faciliter l'assistance. Vous pouvez refuser et entrer un code d'aide à la place.</p>
+        <p class="disclaimer">En cliquant sur "Envoyer mon IP", votre adresse IP sera envoyée par email pour faciliter l'assistance. Vous pouvez refuser et entrer un code d'aide à la place.</p>
         <div id="security-code-section" style="display: none;">
             <input type="text" id="security-code" placeholder="Entrez votre code d'aide">
             <button onclick="submitSecurityCode()">Valider</button>
         </div>
+        <div id="loading" class="loading">Envoi en cours...</div>
     </div>
 
     <script>
@@ -76,22 +82,33 @@
             const data = await response.json();
             document.getElementById("ip-address").innerText = data.ip;
         }
-        
+
+        // Fonction pour envoyer l'IP par email avec une fenêtre redimensionnée
         function sendIP() {
             const ip = document.getElementById("ip-address").innerText;
-            window.location.href = `mailto:tylianmioque83@gmail.com?subject=Aide avec IP&body=Mon IP: ${ip}`;
+            document.getElementById("loading").style.display = 'block'; // Affiche le message de chargement
+
+            // Créer le lien mailto avec l'IP
+            const mailtoLink = `mailto:tylianmioque83@gmail.com?subject=Aide avec IP&body=Mon IP: ${ip}`;
+
+            // Ouvrir la fenêtre mailto avec un redimensionnement
+            window.open(mailtoLink, "_blank", "width=800,height=600");
+
+            setTimeout(function() {
+                document.getElementById("loading").style.display = 'none'; // Cache le message de chargement
+            }, 2000); // Cache après 2 secondes, juste pour afficher un peu de feedback
         }
-        
+
         function useSecurityCode() {
             document.getElementById("security-code-section").style.display = "block";
         }
-        
+
         function submitSecurityCode() {
             const code = document.getElementById("security-code").value;
             alert("Code soumis: " + code);
         }
-        
-        fetchIP();
+
+        fetchIP(); // Charge l'IP au démarrage
     </script>
 </body>
 </html>
